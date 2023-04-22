@@ -36,7 +36,23 @@ def stl(mark):
         if matched != None:
             print(f"{steel[matched.group()]}")
             mark = mark.replace(matched.group(), "")
+            if matched.group() == "СТ":
+                structural_steel(mark)
+#         function for the normal steel
 
+# расшифровка констуркционной стали
+def structural_steel(mark):
+    gost_num = re.findall("[0-9]+", mark[0])
+    print("Номер стали по ГОСТ-380-2005: ", gost_num[0])
+    mark = mark.replace(gost_num[0], "")
+    if "Г" in mark:
+        print("Сталь содержит марганец выше 0.8%")
+        mark = mark.replace("Г", "")
+    for i in deoxidation.keys():
+        deox = re.compile(i)
+        matched = deox.match(mark)
+        if matched != None:
+            print(f"По окислению сталь {deoxidation[matched.group()]}")
 
 # расшифровка марки чугуна
 def cast_iron_name(mark):
@@ -64,6 +80,8 @@ def cast_iron_params(mark):
             print(f"Относительное удлинение: {length.group().replace('-', '')}%")
 
 grnt("БСТ4СП")
+print("\n")
 grnt("СТ4ПС")
+print("\n")
 grnt("СТАЛЬУ07")
 
