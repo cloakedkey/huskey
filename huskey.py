@@ -3,7 +3,7 @@ import re
 cast_iron = {'СЧ':'Серый чугун', 'КЧ':'Ковкий чугун',
     'ВЧ': 'Высокопрочный чугун', 'А': 'Антифрикционный'}
 
-steel = {'СТАЛЬ': 'Качественная сталь', 'СТ': 'Конструкционная сталь'}
+steel = {'СТАЛЬ': 'Качественная сталь', 'СТ': 'Сталь обыкновенного качества'}
 
 guarantees = {'А': 'Завод гарантирует заданные механические свойства',
               'Б': 'Завод гарантирует химический состав',
@@ -38,11 +38,33 @@ def stl(mark):
             mark = mark.replace(matched.group(), "")
             if matched.group() == "СТ":
                 structural_steel(mark)
-#         function for the normal steel
+            else:
+                quality_steel(mark)
 
-# расшифровка констуркционной стали
+# расшифровка качественной стали
+# Теперь необходимо избавиться от доп марок таких как А так как из-за этого будут проблемы
+# ведь такая марка будет иметь вид СтальАУ10Н5 что А в этом случае забьёт match метод regex.
+# Сталь без аргумента У не будет выводить углерод, что верно.
+def quality_steel(mark):
+    if "У" in mark:
+        print("Сталь инструменатльная")
+        mark = mark.replace("У", "")
+        carbon_pat = re.compile("[0-9]+")
+        carbon = carbon_pat.match(mark)
+        carbon = carbon.group()
+        if carbon[0] == "0":
+            print(f"Содержание углерода: {carbon[0]}.{carbon[1]}%")
+        else:
+            print(f"Содержание углерода: 0.{carbon}%")
+
+    else:
+        print("Сталь конструкционная")
+
+
+# расшифровка обыкновенной стали
 def structural_steel(mark):
     gost_num = re.findall("[0-9]+", mark[0])
+    print("Сталь конструкционная")
     print("Номер стали по ГОСТ-380-2005: ", gost_num[0])
     mark = mark.replace(gost_num[0], "")
     if "Г" in mark:
@@ -83,5 +105,6 @@ grnt("БСТ4СП")
 print("\n")
 grnt("СТ4ПС")
 print("\n")
-grnt("СТАЛЬУ07")
-
+grnt("СТАЛЬУ07Н5")
+print("\n")
+grnt("СТАЛЬУ10Н4")
